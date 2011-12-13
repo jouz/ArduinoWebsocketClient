@@ -78,10 +78,13 @@ void WebSocketClient::setDataArrivedDelegate(DataArrivedDelegate dataArrivedDele
 }
 
 bool WebSocketClient::readHandshake() {
-    String handshake = "", line;
+	String handshake = "", line;
 	int timeout = millis()+_timeout;
-    while(!_client.available()) {
-		if (millis()>timeout) return false;
+	while(!_client.available()) {
+		if (millis()>timeout) {
+			_client.stop();
+			return false;
+		}
 	}
     while((line = readLine()) != "") {
         handshake += line;
