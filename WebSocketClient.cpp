@@ -28,20 +28,12 @@
 #include <stdlib.h>
 #include "WProgram.h"
 
-#ifdef WIFLY
-WebSocketClient::WebSocketClient(const char *hostname, String path, int port) :
-	_client(hostname, port)
-{
-    _port = port;
-    _hostname = hostname;
-    _path = path;
-}
-#else
-WebSocketClient::WebSocketClient(byte server[], String path, int port) :
-    _client(server, port)
+
+WebSocketClient::WebSocketClient(byte server[], String path, int port)
 {
     _port = port;
     _path = path;
+	_server = server;
     
     _hostname = String();
     int size = sizeof(server);
@@ -54,11 +46,10 @@ WebSocketClient::WebSocketClient(byte server[], String path, int port) :
     }
     
 }
-#endif
 
 bool WebSocketClient::connect() {
     bool result = false;
-    if (_client.connect()) {
+    if (_client.connect(_server, _port)) {
         sendHandshake();
         result = readHandshake();
     }
