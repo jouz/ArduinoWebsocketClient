@@ -1,4 +1,8 @@
 # ArduinoWebsocketClient, an Arduino client for connecting and messaging with Websockets
+
+## This Fork
+This version is forked from @krohling. This version is tested to work with Arduino 1.0 and websocket.io for nodejs. It works the same as the previous version, except there is an additional timeout parameter to the WebSocketClient constructor. Note that the example is broken. Looks like echo.websocket.org doesn't allow connections anymore (that are not secure?).
+
 Blog: [World Domination Using Arduinos And Websockets](http://kevinrohling.wordpress.com/2011/09/14/world-domination-using-arduinos-and-websockets)
 
 Websockets currently provide a simple and lightweight way to send and receive messages from web browsers.  This project was developed to extend this capability to embedded devices (Arduinos).  It is my hope that allowing devices to easily send information about themselves as well as respond to messages received from hosted services will result in some interesting applications.
@@ -35,4 +39,4 @@ void dataArrived(WebSocketClient client, String data) {
 
 ## Examples
 
-There are two examples included with this library.  The first, EchoExample will connect to echo.websocket.org, which hosts a service that simply echos any messages that you send it via Websocket.  This example sends the message "Hello World!".  If the example runs correctly, the Arduino will receive this same message back over the Websocket and print it via Serial.println.  The second example does the exact same thing, but is modified to work with the [WiFly Client library](https://github.com/sparkfun/WiFly-Shield).  For this example to compile correctly you must open WebsocketClient.h and follow instructions to uncomment the specified compiler directive.  If your Arduino uses an Ethernet shield don't bother with the WiFly example.
+EchoExample will connect to echo.websocket.org, which hosts a service that simply echos any messages that you send it via Websocket.  This example sends the message "Hello World!".  If the example runs correctly, the Arduino will receive this same message back over the Websocket and print it via Serial.println.  
