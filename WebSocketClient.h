@@ -32,23 +32,23 @@
 #include "Arduino.h"
 
 class WebSocketClient {
-	public:
+    public:
         WebSocketClient(byte server[], String path, int port = 80, int timeout = 3000);
-		typedef void (*DataArrivedDelegate)(WebSocketClient client, String data);
-		bool connect();
+        typedef void (*DataArrivedDelegate)(WebSocketClient client, String data);
+        bool connect();
         bool connected();
         void disconnect();
-		void monitor();
-		void setDataArrivedDelegate(DataArrivedDelegate dataArrivedDelegate);
-		void send(String data);
+        void monitor();
+        void setDataArrivedDelegate(DataArrivedDelegate dataArrivedDelegate);
+        void send(String data);
         void sendHandshake();
-	private:
-		EthernetClient _client;
+    private:
+        EthernetClient _client;
         int    _port;
         String _path;
         String _hostname;
-		byte*  _server;
-		int    _timeout;
+        byte*  _server;
+        int    _timeout;
         DataArrivedDelegate _dataArrivedDelegate;
         bool readHandshake();
         String readLine();

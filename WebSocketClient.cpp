@@ -2,7 +2,7 @@
  WebsocketClient, a websocket client for Arduino
  Copyright 2011 Kevin Rohling
  http://kevinrohling.com
- 
+    
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
@@ -27,8 +27,8 @@
 WebSocketClient::WebSocketClient(byte server[], String path, int port, int timeout) {
     _port = port;
     _path = path;
-	_server = server;
-	_timeout = timeout;
+    _server = server;
+    _timeout = timeout;
     _hostname = String();
     int size = sizeof(server);
     for (int i = 0; i < size; i++) {
@@ -37,7 +37,7 @@ WebSocketClient::WebSocketClient(byte server[], String path, int port, int timeo
         if (i != size-1) {
             _hostname += ".";
         }
-    }	   
+    }       
 }
 
 bool WebSocketClient::connect() {
@@ -45,7 +45,7 @@ bool WebSocketClient::connect() {
         sendHandshake();
         return readHandshake();
     }
-	return false;
+    return false;
 }
 
 bool WebSocketClient::connected() {
@@ -57,35 +57,35 @@ void WebSocketClient::disconnect() {
 }
 
 void WebSocketClient::monitor() {
-	if (!_client.available()) return;
-	char c = _client.read();
+    if (!_client.available()) return;
+    char c = _client.read();
     String data = "";
-	if (c == 0) {
-		c = _client.read();
-		while(c >= 0) {
-			data += c;
-			c = _client.read();
-		}
-		
-		if (_dataArrivedDelegate != NULL) {
-			_dataArrivedDelegate(*this, data);
-		}
-	}
+    if (c == 0) {
+        c = _client.read();
+        while(c >= 0) {
+            data += c;
+            c = _client.read();
+        }
+        
+        if (_dataArrivedDelegate != NULL) {
+            _dataArrivedDelegate(*this, data);
+        }
+    }
 }
 
 void WebSocketClient::setDataArrivedDelegate(DataArrivedDelegate dataArrivedDelegate) {
-	  _dataArrivedDelegate = dataArrivedDelegate;
+      _dataArrivedDelegate = dataArrivedDelegate;
 }
 
 bool WebSocketClient::readHandshake() {
-	String handshake = "", line;
-	int timeout = millis()+_timeout;
-	while(!_client.available()) {
-		if (millis()>timeout) {
-			_client.stop();
-			return false;
-		}
-	}
+    String handshake = "", line;
+    int timeout = millis()+_timeout;
+    while(!_client.available()) {
+        if (millis()>timeout) {
+            _client.stop();
+            return false;
+        }
+    }
     while((line = readLine()) != "") {
         handshake += line;
     }
@@ -110,18 +110,18 @@ String WebSocketClient::readLine() {
     String line = "";
     char c = 0;
     while(c != '\n') {
-		if (_client.available()) {
-			c = _client.read();
-			if (c != '\n' && c != '\r' && c != -1) {
-				line += c;
-			}
-		}
+        if (_client.available()) {
+            c = _client.read();
+            if (c != '\n' && c != '\r' && c != -1) {
+                line += c;
+            }
+        }
     }
     return line;
 }
 
 void WebSocketClient::send(String data) {
     _client.print((char)0);
-	_client.print(data);
+    _client.print(data);
     _client.print((char)255);
 }
