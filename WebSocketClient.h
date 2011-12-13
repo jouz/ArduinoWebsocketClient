@@ -9,7 +9,7 @@
 
 class WebSocketClient {
 	public:
-        WebSocketClient(byte server[], String path, int port = 80);
+        WebSocketClient(byte server[], String path, int port = 80, int timeout = 3000);
 		typedef void (*DataArrivedDelegate)(WebSocketClient client, String data);
 		bool connect();
         bool connected();
@@ -24,6 +24,7 @@ class WebSocketClient {
         String _path;
         String _hostname;
 		byte*  _server;
+		int    _timeout;
         DataArrivedDelegate _dataArrivedDelegate;
         bool readHandshake();
         String readLine();

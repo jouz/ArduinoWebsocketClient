@@ -23,18 +23,12 @@
  */
 
 #include <WebSocketClient.h>
-#include <WString.h>
-#include <string.h>
-#include <stdlib.h>
-#include "WProgram.h"
 
-
-WebSocketClient::WebSocketClient(byte server[], String path, int port)
-{
+WebSocketClient::WebSocketClient(byte server[], String path, int port, int timeout) {
     _port = port;
     _path = path;
 	_server = server;
-    
+	_timeout = timeout;
     _hostname = String();
     int size = sizeof(server);
     for (int i = 0; i < size; i++) {
@@ -43,18 +37,15 @@ WebSocketClient::WebSocketClient(byte server[], String path, int port)
         if (i != size-1) {
             _hostname += ".";
         }
-    }
-    
+    }	   
 }
 
 bool WebSocketClient::connect() {
-    bool result = false;
     if (_client.connect(_server, _port)) {
         sendHandshake();
-        result = readHandshake();
+        return readHandshake();
     }
-    
-	return result;
+	return false;
 }
 
 bool WebSocketClient::connected() {
@@ -65,31 +56,21 @@ void WebSocketClient::disconnect() {
     _client.stop();
 }
 
-void WebSocketClient::monitor () {
-    char character;
-	if ((character = _client.read()) == 0) {
-        String data = "";
-        bool done = false;
-        bool endReached = false;
-        while (!done) {
-            character = _client.read();
-            if (character != -1) {
-                data += character;
-                endReached = false;
-            }
-            else if(endReached) {
-                done = true;
-            }
-            else {
-                endReached = true;
-                delay(10);
-            }
-        }
-        
-        if (_dataArrivedDelegate != NULL) {
-            _dataArrivedDelegate(*this, data);
-        }
-    }
+void WebSocketClient::monitor() {
+	if (!_client.available()) return;
+	char c = _client.read();
+    String data = "";
+	if (c == 0) {
+		c = _client.read();
+		while(c >= 0) {
+			data += c;
+			c = _client.read();
+		}
+		
+		if (_dataArrivedDelegate != NULL) {
+			_dataArrivedDelegate(*this, data);
+		}
+	}
 }
 
 void WebSocketClient::setDataArrivedDelegate(DataArrivedDelegate dataArrivedDelegate) {
@@ -97,20 +78,15 @@ void WebSocketClient::setDataArrivedDelegate(DataArrivedDelegate dataArrivedDele
 }
 
 bool WebSocketClient::readHandshake() {
-    bool result = false;
-    char character;
     String handshake = "", line;
-    
-    while((character = _client.read()) == -1) {}
-    handshake += character;
-    
+	int timeout = millis()+_timeout;
+    while(!_client.available()) {
+		if (millis()>timeout) return false;
+	}
     while((line = readLine()) != "") {
         handshake += line;
     }
-    
-    result = handshake.indexOf("HTTP/1.1 101 Web Socket Protocol Handshake") != -1;
-    
-    return result;
+    return handshake.indexOf("HTTP/1.1 101 Web Socket Protocol Handshake") != -1;
 }
 
 void WebSocketClient::sendHandshake() {
@@ -129,19 +105,20 @@ void WebSocketClient::sendHandshake() {
 
 String WebSocketClient::readLine() {
     String line = "";
-    char character;
-    while((character = _client.read()) != '\n') {
-        if (character != '\r' && character != -1) {
-            line += character;
-        }
+    char c = 0;
+    while(c != '\n') {
+		if (_client.available()) {
+			c = _client.read();
+			if (c != '\n' && c != '\r' && c != -1) {
+				line += c;
+			}
+		}
     }
-    
     return line;
 }
 
-void WebSocketClient::send (String data) {
+void WebSocketClient::send(String data) {
     _client.print((char)0);
 	_client.print(data);
     _client.print((char)255);
 }
-
